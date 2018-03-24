@@ -3,3 +3,6 @@ Binnen deze repository bevinden zich scripts gebouwd en gebruikt in projecten/op
 Deze repository is open/publiek en gebruik van de scripts is op eigen risico. 
 
 WARNING: Sommige scripts zijn gebouwd voor een LAB/Test environment. Deze zullen dan alleen werken in specifieke omstandigheden. Of zelfs helemaal niet. 
+
+# Aanwezige Projecten
+Binnen de folder Scripts zijn de volgende projecten aanwezig: Globomantics, Kickstart-IT

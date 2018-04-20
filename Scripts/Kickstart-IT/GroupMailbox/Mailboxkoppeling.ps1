@@ -1,4 +1,4 @@
-﻿#############################################
+#############################################
 #  _______ _                                 _  ___ _ _                             
 # |__   __| |                               | |/ / (_|_)                            
 #    | |  | |__   ___  _ __ ___   __ _ ___  | ' /| |_ _ _ __  _ __ ___   __ _ _ __  
@@ -28,18 +28,20 @@ echo ""
 Import-Module ActiveDirectory
 Add-PSSnapin Microsoft.Exchange.Management.PowerShell.SnapIn;
 
-$LogPath = "\\ZEUS\log\"
+$csv = Import-Csv -Path ".\groupmailbox.csv"
+$LogPath = "\\ZEUS\log$\"
 
 $Username = Read-Host 'Privileged Account.'
 $LoginPassword = Get-Credential "KICKSTART-IT\$Username"
 
-$SharedMailbox = Read-Host 'Voer de naam van de Shared mailbox in:'
-$UniversalGroup = Read-Host 'Voer de naam van de Universal group in:'
-​
-Get-Mailbox $SharedMailbox | Add-ADPermission -User $UniversalGroup -ExtendedRights "Send As"
-Get-Mailbox $SharedMailbox | Add-MailboxPermission -User $UniversalGroup -AccessRights FullAccess
-
-  Write-Output "Log bestand schrijven.."
+ForEach ($item In $csv) { 
+    ​
+    Get-Mailbox $($item.SharedMailbox) | Add-ADPermission -User $($item.UniversalGroup) -ExtendedRights "Send As"
+    Get-Mailbox $($item.SharedMailbox) | Add-MailboxPermission -User $($item.UniversalGroup) -AccessRights FullAccess
+    
+    Write-Output "Log bestand schrijven.."
      $generatelog1 = New-PSDrive LogFile -PSProvider FileSystem -Root $LogPath -Credential $LoginPassword
 	 $generatelog2 = "$Username heeft de Shared mailbox $SharedMailbox gekoppeld met $UniversalGroup - $(Get-Date -Format g)" | Out-File -Encoding utf8 -FilePath LogFile:\SharedmailboxKoppeling\$newFolderName.txt
 	 $generatelog3 = Remove-PSDrive LogFile
+    
+ }

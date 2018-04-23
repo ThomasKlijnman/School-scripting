@@ -40,6 +40,7 @@ $confirm = Read-Host "Correct? Y/N"
 
 If(($confirm) -ne "y")
 {
+ Write-Host -ForegroundColor Red "Script gestopt door de gebruiker."
  End
 }
 

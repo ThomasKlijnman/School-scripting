@@ -32,7 +32,7 @@ $LoginPassword = Get-Credential "KICKSTART-IT\$Username"
 $path = "\\Zeus\Projects\"
 $newFolderName = Read-Host -Prompt "Voor de naam van de nieuwe folder in"
 $newFolderFull = $path + $newFolderName
-Write-Output "Nieuwe folder naam: $newFolderFull"
+Write-Host "Nieuwe folder naam: $newFolderFull"
 
 $LogPath = "\\Zeus\log$"
 $ADPath = "OU=Groups,OU=Beheer,DC=Kickstart-IT,DC=local"
@@ -44,16 +44,16 @@ If(($confirm) -ne "y")
 }
 
 Else {
- Write-Output -ForegroundColor Green "Security groepen aanmaken"
+ Write-Host -ForegroundColor Green "Security groepen aanmaken.."
   $groupnameM = "G-FS-Project-$newFolderName-M"
   $groupnameR = "G-FS-Project-$newFolderName-R"
-    New-AdGroup $groupNameM -samAccountName $groupNameM -GroupScope Global -path $ADPath
-    New-AdGroup $groupNameR -samAccountName $groupNameR -GroupScope Global -path $ADPath
+    New-AdGroup $groupNameM -samAccountName $groupNameM -GroupScope Global -path $ADPath -Description "Globale File share voor het project $newFolderName"
+    New-AdGroup $groupNameR -samAccountName $groupNameR -GroupScope Global -path $ADPath -Description "Globale File share voor het project $newFolderName"
 
- Write-Output -ForegroundColor Green "Folder toevoegen.."
+ Write-Host -ForegroundColor Green "Folder toevoegen.."
     New-Item $newFolderFull -ItemType Directory
 
- Write-Output -ForegroundColor Green "Kopiëren van inheritance.."
+ Write-Host -ForegroundColor Green "Kopiëren van inheritance.."
     icacls $newFolderFull /inheritance:e
     
     $readOnly = [System.Security.AccessControl.FileSystemRights]"ReadAndExecute"
@@ -76,7 +76,7 @@ Else {
     $objACL.AddAccessRule($accessControlEntryR)
     Set-ACL $newFolderFull $objACL
 
- Write-Output -ForegroundColor Green "Log bestand schrijven.."
+ Write-Host -ForegroundColor Green "Log bestand schrijven.."
     $generatelog1 = New-PSDrive LogFile -PSProvider FileSystem -Root $LogPath -Credential $LoginPassword
 	$generatelog2 = "$Username heeft het project $newFolderName toegevoegd met de groepen $groupnameM en $groupnameR - $(Get-Date -Format g)" | Out-File -Encoding utf8 -FilePath LogFile:\ProjectCreation\$newFolderName.txt
 	$generatelog3 = Remove-PSDrive LogFile

@@ -29,7 +29,7 @@ Import-Module ActiveDirectory
 $Username = Read-Host 'Privileged Account.'
 $LoginPassword = Get-Credential "KICKSTART-IT\$Username"
 
-$path = "\\Zeus\e$\Projects"
+$path = "\\Zeus\Projects\"
 $newFolderName = Read-Host -Prompt "Voor de naam van de nieuwe folder in"
 $newFolderFull = $path + $newFolderName
 Write-Output "Nieuwe folder naam: $newFolderFull"
@@ -44,17 +44,17 @@ If(($confirm) -ne "y")
 }
 
 Else {
-Write-Output "Security groepen aanmaken"
- $groupnameM = "G-Project-$newFolderName-M"
- $groupnameR = "G-Project-$newFolderName-R"
-    New-AdGroup $groupNameM -samAccountName $groupNameM -GroupScope DomainLocal -path $ADPath
-    New-AdGroup $groupNameR -samAccountName $groupNameR -GroupScope DomainLocal -path $ADPath
+ Write-Output "Security groepen aanmaken"
+  $groupnameM = "G-Project-$newFolderName-M"
+  $groupnameR = "G-Project-$newFolderName-R"
+    New-AdGroup $groupNameM -samAccountName $groupNameM -GroupScope Global -path $ADPath
+    New-AdGroup $groupNameR -samAccountName $groupNameR -GroupScope Global -path $ADPath
 
-Write-Output "Folder toevoegen.."
+ Write-Output "Folder toevoegen.."
     New-Item $newFolderFull -ItemType Directory
 
-Write-Output "Verwijderen van inheritance.."
-    icacls $newFolderFull /inheritance:d
+ Write-Output "Kopiëren van inheritance.."
+    icacls $newFolderFull /inheritance:e
     
     $readOnly = [System.Security.AccessControl.FileSystemRights]"ReadAndExecute"
     $readWrite = [System.Security.AccessControl.FileSystemRights]"Modify"
@@ -76,7 +76,7 @@ Write-Output "Verwijderen van inheritance.."
     $objACL.AddAccessRule($accessControlEntryR)
     Set-ACL $newFolderFull $objACLi
 
-  Write-Output "Log bestand schrijven.."
+ Write-Output "Log bestand schrijven.."
      $generatelog1 = New-PSDrive LogFile -PSProvider FileSystem -Root $LogPath -Credential $LoginPassword
 	 $generatelog2 = "$Username heeft het project $newFolderName toegevoegd met de groepen $groupnameM en $groupnameR - $(Get-Date -Format g)" | Out-File -Encoding utf8 -FilePath LogFile:\ProjectCreation\$newFolderName.txt
 	 $generatelog3 = Remove-PSDrive LogFile

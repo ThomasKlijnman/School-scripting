@@ -44,16 +44,16 @@ If(($confirm) -ne "y")
 }
 
 Else {
- Write-Output "Security groepen aanmaken"
-  $groupnameM = "G-Project-$newFolderName-M"
-  $groupnameR = "G-Project-$newFolderName-R"
+ Write-Output -ForegroundColor Green "Security groepen aanmaken"
+  $groupnameM = "G-FS-Project-$newFolderName-M"
+  $groupnameR = "G-FS-Project-$newFolderName-R"
     New-AdGroup $groupNameM -samAccountName $groupNameM -GroupScope Global -path $ADPath
     New-AdGroup $groupNameR -samAccountName $groupNameR -GroupScope Global -path $ADPath
 
- Write-Output "Folder toevoegen.."
+ Write-Output -ForegroundColor Green "Folder toevoegen.."
     New-Item $newFolderFull -ItemType Directory
 
- Write-Output "Kopiëren van inheritance.."
+ Write-Output -ForegroundColor Green "Kopiëren van inheritance.."
     icacls $newFolderFull /inheritance:e
     
     $readOnly = [System.Security.AccessControl.FileSystemRights]"ReadAndExecute"
@@ -72,13 +72,13 @@ Else {
     $accessControlEntryR = New-Object System.Security.AccessControl.FileSystemAccessRule @($userR, $readOnly, $inheritanceFlag, $propagationFlag, $type)
     $objACL = Get-ACL $newFolderFull
     $objACL.RemoveAccessRuleAll($accessControlEntryDefault)
-    $objACL.AddAccessRule($accessControlEntryRW)
+    $objACL.AddAccessRule($accessControlEntryM)
     $objACL.AddAccessRule($accessControlEntryR)
-    Set-ACL $newFolderFull $objACLi
+    Set-ACL $newFolderFull $objACL
 
- Write-Output "Log bestand schrijven.."
-     $generatelog1 = New-PSDrive LogFile -PSProvider FileSystem -Root $LogPath -Credential $LoginPassword
-	 $generatelog2 = "$Username heeft het project $newFolderName toegevoegd met de groepen $groupnameM en $groupnameR - $(Get-Date -Format g)" | Out-File -Encoding utf8 -FilePath LogFile:\ProjectCreation\$newFolderName.txt
-	 $generatelog3 = Remove-PSDrive LogFile
+ Write-Output -ForegroundColor Green "Log bestand schrijven.."
+    $generatelog1 = New-PSDrive LogFile -PSProvider FileSystem -Root $LogPath -Credential $LoginPassword
+	$generatelog2 = "$Username heeft het project $newFolderName toegevoegd met de groepen $groupnameM en $groupnameR - $(Get-Date -Format g)" | Out-File -Encoding utf8 -FilePath LogFile:\ProjectCreation\$newFolderName.txt
+	$generatelog3 = Remove-PSDrive LogFile
 
 }
